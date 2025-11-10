@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for Databricks_etl1.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: Databricks_etl1
+  name: databricks-elt-project
   uuid: fd36bafa-7221-4424-b68c-da9100bc73e7
 
 include:

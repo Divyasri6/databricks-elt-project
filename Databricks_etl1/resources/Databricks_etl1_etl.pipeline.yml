@@ -1,0 +1,22 @@
+# The main pipeline for Databricks_etl1
+
+resources:
+  pipelines:
+    Databricks_etl1_etl:
+      name: databricks-elt-project
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "../src/Databricks_etl1_etl"
+
+      libraries:
+        - glob:
+            include: ../src/Databricks_etl1_etl/transformations/**
+      include:
+        - resources/*.yml
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}

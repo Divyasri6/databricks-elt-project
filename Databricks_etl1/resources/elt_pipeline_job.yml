@@ -1,39 +1,29 @@
 # The main pipeline for Databricks_etl1
 
+# resources/elt_pipeline_job.yml
 resources:
   jobs:
     elt_pipeline_job:
-      # This is the name of the job as it will appear in the Databricks UI
       name: "ELT Pipeline (Bronze-Silver-Gold)"
       tasks:
         - task_key: "Bronze_Ingestion"
           notebook_task:
-            # Path to the notebook from the bundle root
-            notebook_path:../src/01_Bronze_Ingestion.ipynb
-
-          # This task will run on a new, cost-effective Job Cluster
+            notebook_path: ../src/01_Bronze_Ingestion.ipynb
           new_cluster:
             spark_version: "14.3.x-scala2.12"
-            # Select a cost-effective GCP node type
-            node_type_id: "n2-standard-4" 
+            node_type_id: "n2-standard-4"
             num_workers: 2
 
         - task_key: "Silver_Transformation"
-          # This task will only run after the Bronze task succeeds
           depends_on:
             - task_key: "Bronze_Ingestion"
           notebook_task:
-            notebook_path:../src/02_Silver_Transformation.ipynb
-
-          # This task REUSES the cluster from the first task
-          # This is a major optimization, saving cluster startup time and cost.
+            notebook_path: ../src/02_Silver_Transformation.ipynb
           existing_cluster_id: ${{jobs.elt_pipeline_job.tasks.Bronze_Ingestion.new_cluster.cluster_id}}
 
         - task_key: "Gold_Aggregation"
           depends_on:
             - task_key: "Silver_Transformation"
           notebook_task:
-            notebook_path:../src/03_Gold_Aggregation.ipynb
-
-          # This task also reuses the same cluster
+            notebook_path: ../src/03_Gold_Aggregation.ipynb
           existing_cluster_id: ${{jobs.elt_pipeline_job.tasks.Bronze_Ingestion.new_cluster.cluster_id}}

@@ -1,8 +1,22 @@
 pipeline {
     agent any
 
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        retry(1)
+    }
+
     environment {
-        DATABRICKS_HOST = "https://<your-databricks-workspace-url>"
+        DATABRICKS_HOST = "https://1275202838893148.8.gcp.databricks.com"
+        TARGET = "${params.TARGET ?: 'dev'}"
+    }
+
+    parameters {
+        choice(
+            name: 'TARGET',
+            choices: ['dev', 'prod'],
+            description: 'Databricks bundle target environment'
+        )
     }
 
     stages {
@@ -12,10 +26,43 @@ pipeline {
             }
         }
 
+        stage('Setup Python Environment') {
+            steps {
+                script {
+                    sh '''
+                        python3 --version
+                        pip3 --version || echo "pip3 not found, installing..."
+                        python3 -m pip install --upgrade pip setuptools wheel || true
+                    '''
+                }
+            }
+        }
+
+        stage('Install Databricks CLI') {
+            steps {
+                script {
+                    sh '''
+                        if ! command -v databricks &> /dev/null; then
+                            echo "Installing Databricks CLI..."
+                            pip3 install databricks-cli --upgrade
+                        else
+                            echo "Databricks CLI already installed"
+                            databricks --version
+                        fi
+                    '''
+                }
+            }
+        }
+
         stage('Validate Bundle') {
             steps {
                 withCredentials([string(credentialsId: 'databricks-pat', variable: 'DATABRICKS_TOKEN')]) {
-                    sh 'databricks bundle validate'
+                    script {
+                        sh '''
+                            export DATABRICKS_TOKEN="${DATABRICKS_TOKEN}"
+                            databricks bundle validate -t ${TARGET}
+                        '''
+                    }
                 }
             }
         }
@@ -23,7 +70,12 @@ pipeline {
         stage('Deploy Bundle') {
             steps {
                 withCredentials([string(credentialsId: 'databricks-pat', variable: 'DATABRICKS_TOKEN')]) {
-                    sh 'databricks bundle deploy -t dev'
+                    script {
+                        sh '''
+                            export DATABRICKS_TOKEN="${DATABRICKS_TOKEN}"
+                            databricks bundle deploy -t ${TARGET}
+                        '''
+                    }
                 }
             }
         }
@@ -31,9 +83,26 @@ pipeline {
         stage('Run ELT Pipeline Job') {
             steps {
                 withCredentials([string(credentialsId: 'databricks-pat', variable: 'DATABRICKS_TOKEN')]) {
-                    sh 'databricks bundle run elt_pipeline_job'
+                    script {
+                        sh '''
+                            export DATABRICKS_TOKEN="${DATABRICKS_TOKEN}"
+                            databricks bundle run elt_pipeline_job -t ${TARGET}
+                        '''
+                    }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
+        }
+        always {
+            cleanWs()
         }
     }
 }

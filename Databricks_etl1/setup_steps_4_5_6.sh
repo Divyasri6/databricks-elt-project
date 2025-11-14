@@ -8,7 +8,7 @@ set -e
 JENKINS_URL="${JENKINS_URL:-http://34.46.99.31:8080}"
 JENKINS_USER="${JENKINS_USER:-admin}"
 JENKINS_TOKEN="${JENKINS_TOKEN:-2RhzPWolIaq_QV0Ka6I9NBEKsAK0hCVgxs1M-XjlQfAbuY8wH4Blm1-bhz-Bhqw3}"
-DATABRICKS_TOKEN="${DATABRICKS_TOKEN:-dapi44c942c03edf2bf6518e2f649b51becfs}"
+DATABRICKS_TOKEN="${DATABRICKS_TOKEN:-dapi6c2c4bb9c81d1d6c6f54cd930b4c5ee2}"
 GIT_URL="${GIT_URL:-https://github.com/Divyasri6/databricks-elt-project.git}"
 JOB_NAME="${JOB_NAME:-databricks-elt-pipeline}"
 

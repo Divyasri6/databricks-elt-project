@@ -230,8 +230,8 @@ def main():
     )
     parser.add_argument(
         "--databricks-token",
-        default="dapi44c942c03edf2bf6518e2f649b51becfs",
-        help="Databricks PAT (default: from guide)"
+        default="dapi6c2c4bb9c81d1d6c6f54cd930b4c5ee2",
+        help="Databricks PAT (default: current token)"
     )
     parser.add_argument(
         "--git-url",

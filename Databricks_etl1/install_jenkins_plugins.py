@@ -94,15 +94,15 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python3 install_jenkins_plugins.py --jenkins-url http://34.46.99.31:8080 --username admin --token YOUR_TOKEN
+  python3 install_jenkins_plugins.py --jenkins-url http://34.42.84.254:8080 --username admin --token YOUR_TOKEN
   python3 install_jenkins_plugins.py  # Will prompt for credentials interactively
         """
     )
     
     parser.add_argument(
         "--jenkins-url",
-        default="http://34.46.99.31:8080",
-        help="Jenkins URL (default: http://34.46.99.31:8080)"
+        default="http://34.42.84.254:8080",
+        help="Jenkins URL (default: http://34.42.84.254:8080)"
     )
     parser.add_argument(
         "--username",

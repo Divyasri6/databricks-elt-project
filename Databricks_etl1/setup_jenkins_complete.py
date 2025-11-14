@@ -52,24 +52,29 @@ def test_connection(jenkins_url, username, token):
         return False, f"Connection error: {str(e)}"
 
 
+def verify_credential_exists(jenkins_url, username, token, credential_id):
+    """Verify if a credential exists"""
+    url = urljoin(jenkins_url, f"/credentials/store/system/domain/_/credential/{credential_id}/api/json")
+    try:
+        response = requests.get(url, auth=(username, token), timeout=10)
+        return response.status_code == 200
+    except:
+        return False
+
+
 def add_databricks_credential(jenkins_url, username, token, databricks_token, credential_id="databricks-pat"):
     """Add Databricks PAT as a credential in Jenkins"""
     print_info(f"Adding Databricks credential with ID: {credential_id}")
     
+    # Check if credential already exists
+    if verify_credential_exists(jenkins_url, username, token, credential_id):
+        print_success(f"Credential '{credential_id}' already exists")
+        return True
+    
     # Jenkins credentials API endpoint
     url = urljoin(jenkins_url, "/credentials/store/system/domain/_/createCredentials")
     
-    # XML payload for secret text credential
-    xml_payload = f"""<?xml version='1.1' encoding='UTF-8'?>
-<com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>
-  <scope>GLOBAL</scope>
-  <id>{credential_id}</id>
-  <description>Databricks PAT for bundle operations</description>
-  <username></username>
-  <password>{databricks_token}</password>
-</com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>"""
-    
-    # Try with SecretTextCredentialsImpl instead (for Secret text)
+    # XML payload for secret text credential (StringCredentialsImpl)
     xml_payload = f"""<?xml version='1.1' encoding='UTF-8'?>
 <com.cloudbees.plugins.credentials.impl.StringCredentialsImpl>
   <scope>GLOBAL</scope>
@@ -109,16 +114,6 @@ def add_databricks_credential(jenkins_url, username, token, databricks_token, cr
             return False
     except requests.exceptions.RequestException as e:
         print_error(f"Error adding credential: {str(e)}")
-        return False
-
-
-def verify_credential_exists(jenkins_url, username, token, credential_id):
-    """Verify if a credential exists"""
-    url = urljoin(jenkins_url, f"/credentials/store/system/domain/_/credential/{credential_id}/api/json")
-    try:
-        response = requests.get(url, auth=(username, token), timeout=10)
-        return response.status_code == 200
-    except:
         return False
 
 

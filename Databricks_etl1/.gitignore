@@ -8,3 +8,17 @@ scratch/**
 !scratch/README.md
 **/explorations/**
 **/!explorations/README.md
+
+# Ignore all .md files
+*.md
+**/*.md
+!README.md
+Databricks_etl1/docs/**
+!Databricks_etl1/docs/README.md
+Databricks_etl1/docs/EXECUTION _SUMMARY.md
+Databricks_etl1/docs/JENKINS_SETUP.md
+Databricks_etl1/docs/QUICK_INSTALL_PLUGINS.md
+Databricks_etl1/docs/STEP_BY_STEP_GUIDE.md
+Databricks_etl1/docs/VERIFY_DATABRICKS_TOKEN.md
+Databricks_etl1/docs/VERIFY_JENKINS_TOKEN.md
+Databricks_etl1/docs/VERIFY_JENKINS_TOKEN.md    

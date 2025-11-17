@@ -6,11 +6,6 @@ pipeline {
         retry(1)
     }
 
-    environment {
-        DATABRICKS_HOST = "https://1275202838893148.8.gcp.databricks.com"
-        TARGET = "${params.TARGET ?: 'dev'}"
-    }
-
     parameters {
         choice(
             name: 'TARGET',
